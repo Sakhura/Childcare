@@ -1,13 +1,15 @@
 package com.sakhura.childcare.data.database
 
 import android.content.Context
-import androidx.databinding.adapters.Converters
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.sakhura.childcare.data.database.dao.CareSessionDao
 import com.sakhura.childcare.data.database.dao.ChildDao
 import com.sakhura.childcare.data.database.dao.ParentDao
 import com.sakhura.childcare.data.database.entities.CareSession
+import com.sakhura.childcare.data.database.entities.Child
 import com.sakhura.childcare.data.database.entities.Parent
 
 @Database(
@@ -15,26 +17,25 @@ import com.sakhura.childcare.data.database.entities.Parent
     version = 1,
     exportSchema = false
 )
-@TypeConverters(Converters::class)
-abstract class ChildCareDatabase : RoomDatabase() {
+abstract class ChildcareDatabase : RoomDatabase() {
     abstract fun childDao(): ChildDao
     abstract fun parentDao(): ParentDao
     abstract fun careSessionDao(): CareSessionDao
 
-    companion object{
+    companion object {
         @Volatile
-        private var INSTANCE: ChildCareDatabase? = null
+        private var INSTANCE: ChildcareDatabase? = null
 
-        fun getDatabase(context: Context): ChildCareDatabase{
-            return INSTANCE ?: synchronized(this){
+        fun getDatabase(context: Context): ChildcareDatabase {
+            return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    ChildCareDatabase::class.java,
+                    ChildcareDatabase::class.java,
                     "childcare_database"
                 ).build()
                 INSTANCE = instance
                 instance
             }
-            }
+        }
     }
 }

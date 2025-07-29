@@ -1,19 +1,25 @@
 package com.sakhura.childcare.data.repository
 
+import com.sakhura.childcare.data.database.dao.CareSessionDao
 import com.sakhura.childcare.data.database.dao.ChildDao
 import com.sakhura.childcare.data.database.dao.ParentDao
 import com.sakhura.childcare.data.database.entities.CareSession
 import com.sakhura.childcare.data.database.entities.Child
-import kotlinx.coroutines.NonDisposableHandle.parent
+import com.sakhura.childcare.data.database.entities.Parent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ChildcareRepository(
+@Singleton
+class ChildcareRepository @Inject constructor(
     private val childDao: ChildDao,
     private val parentDao: ParentDao,
     private val careSessionDao: CareSessionDao
 ) {
-    fun getAllChildren() = childDao.getAllChildren()
+    fun getAllChildren(): Flow<List<Child>> = childDao.getAllChildren()
 
-    suspend fun getChildById(id: Long) = childDao.getChildById(id)
+    fun getChildById(id: Long): Flow<Child> = childDao.getChildById(id)
 
     suspend fun insertChild(child: Child, parents: List<Parent>): Long {
         val childId = childDao.insertChild(child)
@@ -23,14 +29,19 @@ class ChildcareRepository(
         return childId
     }
 
-    suspend fun getParentsByChildId(childId: Long) = parentDao.getParentsByChildId(childId)
+    fun getParentsByChildId(childId: Long): Flow<List<Parent>> =
+        parentDao.getParentsByChildId(childId)
 
-    suspend fun startCareSession(childId: Long, hourlyRate: Double): Long {
+    // Actualiza este método en ChildcareRepository.kt
+
+    suspend fun startCareSession(childId: Long): Long {
+        // Obtener el niño para usar su tarifa por hora
+        val child = childDao.getChildById(childId).first()
         val session = CareSession(
             childId = childId,
             startTime = System.currentTimeMillis(),
             endTime = null,
-            hourlyRate = hourlyRate
+            hourlyRate = child.hourlyRate
         )
         return careSessionDao.insertSession(session)
     }
@@ -47,9 +58,11 @@ class ChildcareRepository(
         }
     }
 
-    suspend fun getSessionsByChildId(childId: Long) = careSessionDao.getSessionsByChildId(childId)
+    fun getSessionsByChildId(childId: Long): Flow<List<CareSession>> =
+        careSessionDao.getSessionsByChildId(childId)
 
-    suspend fun getActiveSession() = careSessionDao.getActiveSession()
+    suspend fun getActiveSession(): CareSession? = careSessionDao.getActiveSession()
 
-    suspend fun getTotalEarningsByChild(childId: Long) = careSessionDao.getTotalEarningsByChild(childId) ?: 0.0
+    suspend fun getTotalEarningsByChild(childId: Long): Double =
+        careSessionDao.getTotalEarningsByChild(childId) ?: 0.0
 }

@@ -9,9 +9,13 @@ import com.sakhura.childcare.data.database.entities.Parent
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface ParentDao{
+interface ParentDao {
     @Query("SELECT * FROM parents WHERE childId = :childId")
     fun getParentsForChild(childId: Long): Flow<List<Parent>>
+
+    // Agregado método que falta en el repositorio
+    @Query("SELECT * FROM parents WHERE childId = :childId")
+    fun getParentsByChildId(childId: Long): Flow<List<Parent>>
 
     @Insert
     suspend fun insertParent(parent: Parent)
@@ -21,5 +25,4 @@ interface ParentDao{
 
     @Delete
     suspend fun deleteParent(parent: Parent)
-
 }
