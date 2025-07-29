@@ -1,12 +1,15 @@
 package com.sakhura.childcare.data.database.entities
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 @Entity(tableName = "children")
 data class Child(
-    @PrimareyKey(autoGenerate = true)
-    val id: Long= 0,
-    val name : String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val name: String,
     val age: Int,
-    val hourltyRate : Double,
-    val notes : String = "",
-    val createdAt : Long = System.currentTimeMillis()
+    val hourlyRate: Double,
+    val notes: String = "",
+    val createdAt: Long = System.currentTimeMillis()
 )
